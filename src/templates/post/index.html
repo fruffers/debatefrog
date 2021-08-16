@@ -1,0 +1,100 @@
+{% extends 'components/base.html' %}
+
+{% block container %}
+    <meta id="topic" data-name="{{topic}}">
+    <div id="infobar"></div>
+    <div class="division">
+    <a><div><h2>{{ claim.ptitle }}</h2><p>Author: {{ claim.pauthor }}</p><p>Rating: {{ claim.prating }}</p>
+    <p>{{ pclaim.pbody }}</p></div></a>
+    Attachments: 
+    {{% for image in images %}}
+        <img src="data:image/png;base64,'{{image}}'">
+    {{% endfor %}}
+    <button>Good</button><button>Bad</button>
+    </div>
+    <br>
+    <br>
+
+    <div id="reply">
+        {% for reply in replies %}
+            Username: {{ reply.ruser }}
+            Rating: {{ reply.rrating }}
+            {{ reply.rbody }}
+            <button>Reply</button>
+            {% for reply in reply.rreplies %}
+                <a href="/showReplies">{{ loop.index }}</a>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div class="replywrapper">
+    <div id="reply">
+    <form id="postform" method="POST">
+        <h2>Title:</h2>
+        <input name="title" id="title" style="width: 80vh; height:6vh; font-size:2.5vh;"></input>
+        <br>
+        <select name="tag" id="forumtag">
+            {% for tag in claimtags %}                
+                <option id="tag" value="{{tag}}"">{{ tag }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <h2>Body:</h2>
+        <textarea form="postform" id="body" name="body" style="width:80vh;height:50vh;overflow-y:scroll;resize:none;"></textarea>
+        <br>
+        <br>
+        <button type="submit" id="postButton">Submit</button>
+        {% if feedback %}
+            <p id="feedback">{{ feedback }}</p>
+        {% endif %}
+    </form>
+    </div>
+    </div>
+
+    <script>
+        function slide() {
+            console.log("slide");
+            let elem = document.getElementById("popper");
+            if (elem.style.visibility == "hidden") {
+                elem.style.visibility = "visible";
+                elem.style.animationDuration = "0.8s";
+                elem.style.animationName = "slidein";
+            } else {
+                elem.style.visibility = "hidden";
+                elem.style.animationDuration = "0";
+                elem.style.animationName = "none";
+            }
+        }
+
+        $("document").ready(function(){
+            $('#postform').submit(function(event){
+            console.log('hello');
+            event.preventDefault();
+            $.ajax({
+                type:'POST',
+                url:'/topicPost',
+                data:{
+                    title: $('#title').val(),
+                    tag: $('#tag').val(),
+                    body: $('#body').val(),
+                    topic: "{{topic}}"
+                },
+                success: function(msg){
+                    if (msg === "") {
+                        alert(msg);
+                    } else {
+                        alert(msg);
+                        $(document).ajaxStop(function() { location.reload(true); });
+                    }
+                },
+                error: function(){
+                alert('Server error, change your post and try again.');
+                }
+            })
+            });
+        });
+
+    </script>
+
+{% endblock %}
+

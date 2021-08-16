@@ -1,0 +1,65 @@
+
+<div id="bar">
+    <button id="loginbtn">Login</button><button id="regbtn">Register</button>
+
+    <div id="loginwrapper">
+        <h1>Login to get started</h1>
+        <hr>
+        <form action="/login" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" placeholder="Enter your username"><br>
+            <label for="password" >Password:</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter your password"><br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            {% if feedback %}
+            <p class="warning-text float-right">{{ feedback }}</p>
+            {% endif %}
+        </form>
+    </div>
+    <div id="regwrapper">
+        <h1>Register your information to jump right in</h1>
+        <hr>
+        <form action="/register" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" placeholder="Enter your username"><br>
+            <label for="email">Email:</label><br>
+            <input type="text" id="email" name="email" placeholder="Enter your email"><br>
+            <label for="password" >Password:</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter your password"><br>
+            <label for="passcheck">Re-enter password:</label><br>
+            <input type="password" id="passcheck" name="passcheck" placeholder="Enter the same password"><br>
+            <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            {% if feedback %}
+            <p class="warning-text float-right">{{ feedback }}</p>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<script>
+    $("#loginbtn").click( function() {
+        // login popup
+        if ($("#loginwrapper").css("visibility") === "hidden") {
+            $("#loginwrapper").css("visibility") = "visible";
+        } else {
+            $("#loginwrapper").css("visibility") = "hidden";
+        }
+    });
+
+    $("#regbtn").click( function() {
+        // login popup
+        if ($("#regwrapper").css("visibility") === "hidden") {
+            $("#regwrapper").css("visibility") = "visible";
+        } else {
+            $("#regwrapper").css("visibility") = "hidden";
+        }
+    });
+    
+</script>
+
+<style>
+    #regwrapper {
+        visibility: hidden;
+    }
+</style>

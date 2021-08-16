@@ -1,0 +1,242 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/main.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/navbar.css') }}">
+    </head>
+    <body>
+        <div id="logregwrapper">
+            <button id="loginbtn">Login</button><button id="regbtn">Register</button>
+            
+            
+                <div id="loginwrapper">
+                    <h1>Login to get started</h1>
+                    <hr>
+                    <div id="loginForm">
+                        <label for="username">Username:</label><br>
+                        <input type="text" id="username" name="username" placeholder="Enter your username"><br>
+                        <label for="password" >Password:</label><br>
+                        <input type="password" id="password" name="password" placeholder="Enter your password"><br>
+                        <br>
+                        <button class="btn btn-primary" id="loginActionBtn">Login</button>
+                        <button class="btn btn-primary" id="logoutActionBtn">Logout</button>
+                        <p class="warning-text float-right" id="feedbackLogin"></p>
+                    </div>
+                </div>
+                <div id="regwrapper">
+                    <h1>Register your information to jump right in</h1>
+                    <hr>
+                    <div id="regForm">
+                        <label for="username">Username:</label><br>
+                        <input type="text" id="username" name="username" placeholder="Enter your username"><br>
+                        <label for="email">Email:</label><br>
+                        <input type="text" id="email" name="email" placeholder="Enter your email"><br>
+                        <label for="password" >Password:</label><br>
+                        <input type="password" id="password" name="password" placeholder="Enter your password"><br>
+                        <label for="passcheck">Re-enter password:</label><br>
+                        <input type="password" id="passcheck" name="passcheck" placeholder="Enter the same password"><br>
+                        <br>
+                        <button class="btn btn-primary" id="regActionBtn">Submit</button>
+                        <p class="warning-text float-right" id="feedbackReg"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="bar">
+            
+            <h1 class="bigTitle">Debate<a id="yel">Frog</a></h1>
+            The place to debate your interests
+            
+        <div id="list-wrapper">
+           
+                <div><a href="{{ url_for('welcome') }}">Home</a></div>
+                <div><a href="{{ url_for('forum') }}">Forum</a></div>
+                <div><a href="{{ url_for('profileShow',username='temp') }}">Profile</a></div>
+        
+        </div>
+            
+        </div>
+
+        
+        <script>
+            $("#loginbtn").click( function() {
+                // login popup
+                if ($("#loginwrapper").css("visibility") === "hidden") {
+                    $("#loginwrapper").css("visibility","visible");
+                } else {
+                    $("#loginwrapper").css("visibility","hidden");
+                }
+            });
+        
+            $("#regbtn").click( function() {
+                // login popup
+                if ($("#regwrapper").css("visibility") === "hidden") {
+                    $("#regwrapper").css("visibility","visible");
+                } else {
+                    $("#regwrapper").css("visibility","hidden");
+                }
+            });
+            
+        </script>
+
+        <style>
+            #regwrapper {
+                visibility: hidden;
+                background-color: white;
+                position: absolute;
+                padding: 8%;
+                float: left;
+                box-shadow: 0px 0px 2px 0px #888888;
+            }
+            #loginwrapper {
+                visibility: hidden;
+                float: left;
+                position: absolute;
+                background-color: white;
+                padding: 8%;
+                box-shadow: 0px 0px 2px 0px #888888;
+            }
+            #regbtn {
+                margin-left: 4%;
+            }
+            #logregwrapper {
+                position: relative;
+            }
+            #searchHolder {
+                margin-left: 8%;
+            }
+            #logregwrapper #logoutbtn {
+                visibility: hidden;
+            }
+        </style>
+
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        </script>
+        <div class="container">
+            {% block container %} {% endblock %}
+        </div>
+        <script>
+            // Perform checks
+            $(document).ready(function(){
+                var isLoggedIn = localStorage.getItem("loggedin");
+
+                if (isloggedIn === 1) {
+                    $("#loginwrapper h1").text("Log out");
+                    $("#loginwrapper #logoutActionBtn").show();
+                    $("#loginwrapper input").hide();
+                    $("#loginwrapper #loginActionBtn").hide();
+                } else {
+                    $("#loginwrapper h1").text("Login to get started");
+                    $("#loginwrapper #logoutActionBtn").hide();
+                    $("#loginwrapper input").show();
+                    $("#loginwrapper #loginActionBtn").show();
+                }
+            }),
+            $("#loginActionBtn").on("click", function(event) {
+                    event.preventDefault();
+                    var username = $("#loginwrapper #username").val();
+                    var password = $("#loginwrapper #password").val();
+
+                    var infeedback = "You are missing";
+                    var missingtracker = false;
+
+                    if (username === null || username === "") {
+                        infeedback += " a username"
+                        missingtracker = true;
+                    }
+                    if (password === null || password === "") {
+                        infeedback += " a password";
+                        missingtracker = true;
+                    }
+
+                    if (missingtracker === true) {
+                        $("#loginwrapper #feedbackLogin").text(infeedback+=".");
+                        missingtracker = false;
+                        return;
+                    }
+
+                    // Send to server where the checks against the database are made and the session can be set on success
+                    var dict = {"username":username,"password":password};
+                    $.ajax({
+                        type: "POST",
+                        url: "/loginPoint",
+                        data: JSON.stringify(dict),
+                        contentType: "application/json"
+                    })
+                    .done(function(response) {
+                        if (response.message === "User logged in successfully.") {
+                            localStorage.setItem("loggedin",1);
+                        }
+                        console.log(response)
+                        $("#loginwrapper #feedbackLogin").text(response.message);
+                    })
+
+            }),
+
+            $("#logoutActionBtn").on("click", function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: "/logoutPoint",
+                    contentType: "application/json"
+                }).done(function(response) {
+                    localStorage.setItem("loggedin",0);
+                    $("#loginwrapper #feedbackLogin").text(response.message);
+                })
+            }),
+
+            $("#regActionBtn").on("click", function(event) {
+                event.preventDefault();
+                var username = $("#regwrapper #username").val();
+                var password = $("#regwrapper #password").val();
+                var email = $("#regwrapper #email").val();
+                var passcheck = $("#regwrapper #passcheck").val();
+
+                var infeedback = "You are missing";
+                var missingtracker = false;
+
+                if (username === null || username === "") {
+                    infeedback += " a username"
+                    missingtracker = true;
+                }
+                if (password === null || password === "") {
+                    infeedback += " a password";
+                    missingtracker = true;
+                }
+                if (email === null || email === "") {
+                    infeedback += " an email";
+                    missingtracker = true;
+                }
+                if (passcheck === null || passcheck === "") {
+                    infeedback += " the password check";
+                    missingtracker = true;
+                }
+
+                if (missingtracker === true) {
+                    $("#regwrapper #feedbackReg").text(infeedback+=".");
+                    missingtracker = false;
+                    return;
+                }
+
+                // Send to server where the checks against the database are made and the session can be set on success
+                var dict = {"username":username,"email":email,"password":password,"passcheck":passcheck};
+                $.ajax({
+                    type: "POST",
+                    url: "/regPoint",
+                    data: JSON.stringify(dict),
+                    contentType: "application/json"
+                })
+                .done(function(response) {
+                    console.log(response);
+                    if (response.message === "Registration successful.") {
+                        localStorage.setItem("loggedin",1);
+                    }
+                    $("#regwrapper #feedbackReg").text(response.message);
+                })
+
+        })
+        
+        </script>
+        <div id="searchHolder"><input style="padding:1%;"/><button>Search</button></div>
+    </body>
+</html>

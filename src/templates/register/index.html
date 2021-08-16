@@ -1,0 +1,27 @@
+{% extends '/components/base.html' %}
+
+{% block container %}
+<html>
+    <head>
+    </head>
+    <body>
+        <h1>Register your information to jump right in</h1>
+        <hr>
+        <form action="/register" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" placeholder="Enter your username"><br>
+            <label for="email">Email:</label><br>
+            <input type="text" id="email" name="email" placeholder="Enter your email"><br>
+            <label for="password" >Password:</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter your password"><br>
+            <label for="passcheck">Re-enter password:</label><br>
+            <input type="password" id="passcheck" name="passcheck" placeholder="Enter the same password"><br>
+            <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            {% if feedbackReg %}
+            <p class="warning-text float-right">{{ feedbackReg }}</p>
+            {% endif %}
+        </form>
+    </body>
+</html>
+{% endblock %}

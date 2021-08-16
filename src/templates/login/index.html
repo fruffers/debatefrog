@@ -1,0 +1,22 @@
+{% extends '/components/base.html' %}
+
+{% block container %}
+<html>
+    <head>
+    </head>
+    <body>
+        <h1>Login to get started</h1>
+        <hr>
+        <form action="/login" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" placeholder="Enter your username"><br>
+            <label for="password" >Password:</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter your password"><br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            {% if feedbackLogin %}
+            <p class="warning-text float-right">{{ feedbackLogin }}</p>
+            {% endif %}
+        </form>
+    </body>
+</html>
+{% endblock %}

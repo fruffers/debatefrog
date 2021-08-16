@@ -1,0 +1,250 @@
+{% extends 'components/base.html' %}
+{% from jinja import Template %}
+
+{% block container %}
+<link rel="stylesheet" href="{{ url_for('static',filename='styles/main.css') }}">
+
+    <meta id="topic" data-name="{{topic}}">
+    <h2>{{ topic }} debate forum</h2>
+    {% for item in claims %}
+    <h1>{{ item.title }}</h1>
+    {% endfor %}
+    <hr>
+    
+    
+    <a><button onclick="slide()" style="float:left;">Reply to claim</button></a>
+    <br>
+    <br>
+    {% for item in claims %}
+        <div id="claimbox">
+            <h1>{{ item.title }}</h1>
+            <h2>User: {{ item.author }}</h2>
+            <p style="color:green;">Related to: {{ item.claimrelate }}</p>
+            <p>{{ item.content }}</p>
+        </div>
+    {% endfor %}
+
+    <div class="popwrap">
+        <div class="popper" id="popper" style="display:none; margin-bottom: 5%; width: 96%;">
+            <div id="replyclaim">
+                <h2>Title:</h2>
+                <input name="title" id="title" style="width: 80vh; height:6vh; font-size:2.5vh;">
+                <br>
+                Relate to claim:
+                <select name="relate" id="relate">          
+                    <option id="relate" value="clarification">Clarification</option>
+                    <option id="relate" value="supporting arguement">Supporting arguement</option>
+                    <option id="relate" value="rebuttal">Rebuttal</option>
+                </select>
+                <br>
+                <h2>Body:</h2>
+                <textarea form="replyclaim" id="body" name="body" style="width:80vh;height:50vh;overflow-y:scroll;resize:none;"></textarea>
+                <br>
+                <br>
+                <button type="submit" id="postButton">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    {% for count, a in enumerate(commentari) %}
+        <a><button onclick="slide2('{{ i[count][0] }}')" style="float:left;">Reply to reply</button></a>
+        <br>
+        <br>
+        <div class="replybox" id="reply{{ i[count][0] }}">
+            <h1>{{ i[count][1] }}</h1>
+            <h2>User: {{ i[count][8] }}</h2>
+            <p>{{ i[count][2] }}</p>
+
+            <div class="popwrap">
+                <div class="popper" id="popper{{ i[count][0] }}" style="display:none; margin-bottom: 5%; width: 96%;">
+                    <div id="replyclaim{{ i[count][0] }}">
+                        <h2>Title:</h2>
+                        <input name="title" id="title" style="width: 80vh; height:6vh; font-size:2.5vh;">
+                        <br>
+                        Relate to reply:
+                        <select name="relate" id="relate">          
+                            <option id="relate" value="evidence">Evidence</option>
+                            <option id="relate" value="support">Support</option>
+                            <option id="relate" value="rebuttal">Rebuttal</option>
+                        </select>
+                        <br>
+                        <h2>Body:</h2>
+                        <textarea form="replyclaim" id="body" name="body" style="width:80vh;height:50vh;overflow-y:scroll;resize:none;"></textarea>
+                        <br>
+                        <br>
+                        <button type="submit" id="postButton{{ i[count][0] }}" onclick="postreplytoreply('{{ i[count][0] }}')">Submit</button>
+                    </div>
+                </div>
+            </div>
+    {% endfor %}
+
+    <!-- {% for a in replies %}
+        {% if a.replyrelate != "reply" %}
+        <a><button onclick="slide2('{{ a.replyid }}')" style="float:left;">Reply to reply</button></a>
+        <br>
+        <br>
+        <div class="replybox" id="reply{{ a.replyid }}">
+            <h1>{{ a.title }}</h1>
+            <h2>User: {{ a.username }}</h2>
+            <p style="color:green;">Related to: {{ a.claimrelate }}</p>
+            <p>{{ a.content }}</p>
+
+            <div class="popwrap">
+                <div class="popper" id="popper{{ a.replyid }}" style="display:none; margin-bottom: 5%; width: 96%;">
+                    <div id="replyclaim{{ a.replyid }}">
+                        <h2>Title:</h2>
+                        <input name="title" id="title" style="width: 80vh; height:6vh; font-size:2.5vh;"></input>
+                        <br>
+                        Relate to reply:
+                        <select name="relate" id="relate">          
+                            <option id="relate" value="evidence">Evidence</option>
+                            <option id="relate" value="support">Support</option>
+                            <option id="relate" value="rebuttal">Rebuttal</option>
+                        </select>
+                        <br>
+                        <h2>Body:</h2>
+                        <textarea form="replyclaim" id="body" name="body" style="width:80vh;height:50vh;overflow-y:scroll;resize:none;"></textarea>
+                        <br>
+                        <br>
+                        <button type="submit" id="postButton{{ a.replyid }}" onclick="postreplytoreply('{{ a.replyid }}')">Submit</button>
+                    </div>
+                </div>
+            </div>
+
+  
+                {% for b in relatedreplies %}
+                    {% if b.replyid1 == a.replyid %}
+    
+                        {% for c in replies %}
+                            {% if c.replyid == b.replyid2 %}
+                            <a><button onclick="slide2('{{ c.replyid }}')" style="float:left;">Reply to reply</button></a>
+                            <br>
+                            <br>
+                            <div class="replybox" id="reply{{ c.replyid }}">
+                                <h1>{{ c.title }}</h1>
+                                <h2>User: {{ c.username }}</h2>
+                                <p style="color:green;">Related to: {{ c.claimrelate }}</p>
+                                <p>{{ c.content }}</p>
+                            </div>
+
+                        <div class="popwrap">
+                            <div class="popper" id="popper{{ c.replyid }}" style="display:none; margin-bottom: 5%; width: 96%;">
+                                <div id="replyclaim{{ c.replyid }}">
+                                    <h2>Title:</h2>
+                                    <input name="title" id="title" style="width: 80vh; height:6vh; font-size:2.5vh;"></input>
+                                    <br>
+                                    Relate to claim:
+                                    <select name="relate" id="relate">          
+                                        <option id="relate" value="clarification">Clarification</option>
+                                        <option id="relate" value="supporting arguement">Supporting arguement</option>
+                                        <option id="relate" value="rebuttal">Rebuttal</option>
+                                    </select>
+                                    <br>
+                                    <h2>Body:</h2>
+                                    <textarea form="replyclaim" id="body" name="body" style="width:80vh;height:50vh;overflow-y:scroll;resize:none;"></textarea>
+                                    <br>
+                                    <br>
+                                    <button type="submit" id="postButton{{ c.replyid }}" onclick="postreplytoreply('{{ c.replyid }}')">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+
+        </div>
+        {% endif %}
+    {% endfor %} -->
+
+
+    <script>
+        function slide() {
+            console.log("slide");
+            let elem = document.getElementById("popper");
+            if (elem.style.display == "none") {
+                elem.style.display = "inline-block";
+                elem.style.animationDuration = "0.8s";
+                elem.style.animationName = "slidein";
+            } else {
+                elem.style.display = "none";
+                elem.style.animationDuration = "0";
+                elem.style.animationName = "none";
+            }
+        }
+
+        function slide2(id) {
+            console.log("slide2");
+            let elem = document.getElementById("popper".concat(id));
+            console.log(elem);
+            if (elem.style.display == "none") {
+                elem.style.display = "inline-block";
+                elem.style.animationDuration = "0.8s";
+                elem.style.animationName = "slidein";
+            } else {
+                elem.style.display = "none";
+                elem.style.animationDuration = "0";
+                elem.style.animationName = "none";
+            }
+        }
+
+        function postreplytoreply(id) {
+            /* need to fill database with new reply info then link the two replies in relatedreplies */
+            console.log("postreplyreply");
+            event.preventDefault();
+            var namelight = "#replyclaim"+id;
+            var title = $(namelight.concat(" #title")).val();
+            var relate = $(namelight.concat(" #relate")).val();
+            var body = $(namelight.concat(" #body")).val();
+            var claimid = "{{claimid}}"
+            var dict = {"title":title,"relate":relate,"body":body,"claimid":claimid,"replyid":id}
+            $.ajax({
+                type:'POST',
+                url:'/replyreplyPoint',
+                data: JSON.stringify(dict),
+                contentType: "application/json"
+                })
+                .done(function(msg){
+                    if (msg.message === "Please log in." || msg.message === "There was an error.") {
+                        alert(msg.message);
+                    } else {
+                        alert(msg.message);
+                        /* Since new reply has been made we get the id and send it back into database again to fill
+                        out relatedreplies */
+                        $(document).ajaxStop(function() { location.reload(true); });
+                    }
+                })
+        }
+
+        /* Reply claim */
+        $("document").ready(function(){
+            $("#postButton").on("click", function(event) {
+                event.preventDefault();
+                var title = $("#replyclaim #title").val();
+                var relate = $("#replyclaim #relate").val();
+                var body = $("#replyclaim #body").val();
+                var claimid = "{{claimid}}"
+                var dict = {"title":title,"relate":relate,"body":body,"claimid":claimid}
+                $.ajax({
+                    type:'POST',
+                    url:'/replyPoint',
+                    data: JSON.stringify(dict),
+                    contentType: "application/json"
+                    })
+                    .done(function(msg){
+                        if (msg.message === "Please log in." || msg.message === "There was an error.") {
+                            alert(msg.message);
+                        } else {
+                            alert(msg.message);
+                            $(document).ajaxStop(function() { location.reload(true); });
+                        }
+                    })
+                })
+            })
+
+    /* Reply reply */
+
+    </script>
+
+{% endblock %}

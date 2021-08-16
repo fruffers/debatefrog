@@ -1,0 +1,87 @@
+{% extends 'components/base.html' %}
+
+{% block container %}
+    <meta id="topic" data-name="{{topic}}">
+    <h1>{{ topic }} debate forum</h1>
+    {% for claim in claims if claim.ptopic == topic %}
+        <div class="division">
+            <a href="{{ url_for('claimPage', topic = topic, claim = claim.ptitle, claimid = claim.pid) }}">{{claim.pid}}<div><h2>{{ claim.ptitle }}</h2><p>Author: {{ claim.pauthor }}</p><p>Last updated: {{ claim.pidate }}</p></div></a>
+        </div>
+    {% endfor %}
+    <br>
+    <br>
+    <a><button onclick="slide()">Make claim</button></a>
+    <br>
+    <br>
+
+    <div class="popwrap">
+    <div id="popper" style="visibility:hidden;">
+    <form id="postform" method="POST">
+        <h2>Title:</h2>
+        <input name="title" id="title" style="width: 80vh; height:6vh; font-size:2.5vh;"></input>
+        <br>
+        Relate to claim:
+        <select name="relate" id="relate">
+            {% for claim in claims %}                
+                <option id="relate" value="{{claim.pid}}"">{{ claim.ptitle }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <h2>Body:</h2>
+        <textarea form="postform" id="body" name="body" style="width:80vh;height:50vh;overflow-y:scroll;resize:none;"></textarea>
+        <br>
+        <br>
+        <button type="submit" id="postButton">Submit</button>
+        {% if feedback %}
+            <p id="feedback">{{ feedback  | safe}}</p>
+        {% endif %}
+    </form>
+    </div>
+    </div>
+
+    <script>
+        function slide() {
+            console.log("slide");
+            let elem = document.getElementById("popper");
+            if (elem.style.visibility == "hidden") {
+                elem.style.visibility = "visible";
+                elem.style.animationDuration = "0.8s";
+                elem.style.animationName = "slidein";
+            } else {
+                elem.style.visibility = "hidden";
+                elem.style.animationDuration = "0";
+                elem.style.animationName = "none";
+            }
+        }
+
+        $("document").ready(function(){
+            $('#postform').submit(function(event){
+                event.preventDefault();
+                $.ajax({
+                    type:'POST',
+                    url:'/makeClaim',
+                    data:{
+                        title: $('#title').val(),
+                        relate: $('#relate').val(),
+                        body: $('#body').val(),
+                        topic: "{{topic}}"
+                    },
+                    success: function(msg){
+                        if (msg === "") {
+                            alert(msg);
+                        } else {
+                            alert(msg);
+                            $(document).ajaxStop(function() { location.reload(true); });
+                        }
+                    },
+                    error: function(){
+                    alert('Server error, change your post and try again.');
+                    }
+                })
+                });
+                });
+
+    </script>
+
+{% endblock %}
+
